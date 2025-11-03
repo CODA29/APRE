@@ -78,4 +78,59 @@ router.get('/regions/:region', (req, res, next) => {
   }
 });
 
+/**
+ * @description
+ *
+ * GET /sales-by-customer/
+ *
+ * Fetches sales data grouped by customer and product.
+ *
+ * Example:
+ * fetch('/sales-by-customer')
+ *  .then(response => response.json())
+ *  .then(data => console.log(data));
+ */
+
+router.get('/sales-by-customer', async (req, res, next) => {
+
+  try{
+    await mongo( async db => {
+      // Aggregate sales data grouped by customer and product
+      const salesByCustomer = await db.collection('sales').aggregate([
+        {
+          $group: {
+            _id: {
+              customer: "$customer",
+              product: "$product"
+            },
+            amount: {
+              $sum: "$amount"
+            }
+          }
+
+        },
+        {
+          $project: {
+            _id: 0,
+            customer: "$_id.customer",
+            product: "$_id.product",
+            amount: 1
+          }
+        }
+
+      ]).toArray();
+
+      // Respond with JSON, even if empty array
+      res.status(200).json(salesByCustomer);
+      console.log('Sales by customer: ', salesByCustomer);
+
+    }, next)
+  }catch(err){
+    console.error('err ', err);
+    next(err);
+  }
+
+});
+
+
 module.exports = router;

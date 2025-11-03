@@ -143,3 +143,47 @@ describe('Apre Sales Report API - Sales by Region', () => {
     });
   });
 });
+
+
+// Test the sales by customer API
+describe('APRE sales by customer report', () => {
+// Define the API endpoint
+ const URL = '/api/reports/sales/sales-by-customer';
+
+ it('should respond with 200, application/json, and an array of sales by customer', async () => {
+    const res = await request(app).get(URL);
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toMatch(/application\/json/);
+    expect(Array.isArray(res.body)).toBe(true);
+ });
+
+ it('should return sales by customer data with customer, product, and amount fields', async () => {
+    const res = await request(app).get(URL);
+    expect(res.status).toBe(200);
+    res.body.forEach(item => {
+      expect(item).toHaveProperty('customer');
+      expect(item).toHaveProperty('product');
+      expect(item).toHaveProperty('amount');
+    });
+ });
+
+ it('should return an empty array if there are no sales records', async () => {
+    // Mock the MongoDB implementation
+    mongo.mockImplementation(async (callback) => {
+      const db = {
+        collection: jest.fn().mockReturnThis(),
+        aggregate: jest.fn().mockReturnValue({
+          toArray: jest.fn().mockResolvedValue([])
+        })
+      };
+      await callback(db);
+    });
+
+    const res = await request(app).get(URL);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([]);
+  });
+
+
+
+});
