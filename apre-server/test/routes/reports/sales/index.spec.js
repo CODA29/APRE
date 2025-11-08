@@ -145,10 +145,17 @@ describe('Apre Sales Report API - Sales by Region', () => {
 });
 
 
-// Test the sales by customer API
+/**
+ *
+ * Test the 'sales by customer' API
+ *
+ */
+
+
 describe('APRE sales by customer report', () => {
 // Define the API endpoint
  const URL = '/api/reports/sales/sales-by-customer';
+
 
  it('should respond with 200, application/json, and an array of sales by customer', async () => {
     const res = await request(app).get(URL);
@@ -166,6 +173,7 @@ describe('APRE sales by customer report', () => {
       expect(item).toHaveProperty('amount');
     });
  });
+
 
  it('should return an empty array if there are no sales records', async () => {
     // Mock the MongoDB implementation

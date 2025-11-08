@@ -28,7 +28,13 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
           </select>
         </div>
         <div class="form__actions">
-          <button class="button button--primary" type="submit">Submit</button>
+
+          <!-- The built in 'title' attribute is used to give the submit button a tooltip
+                for accessibility purposes. When a user hovers over the button, the tooltip
+                text "Click to fetch data" will be displayed.
+          -->
+          <button class="button button--primary" type="submit" title ="Click to fetch data">Submit</button>
+
         </div>
       </form>
 

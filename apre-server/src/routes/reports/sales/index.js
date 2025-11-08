@@ -78,6 +78,9 @@ router.get('/regions/:region', (req, res, next) => {
   }
 });
 
+
+
+
 /**
  * @description
  *
@@ -98,6 +101,7 @@ router.get('/sales-by-customer', async (req, res, next) => {
       // Aggregate sales data grouped by customer and product
       const salesByCustomer = await db.collection('sales').aggregate([
         {
+          // Group by customer and product
           $group: {
             _id: {
               customer: "$customer",
@@ -110,6 +114,7 @@ router.get('/sales-by-customer', async (req, res, next) => {
 
         },
         {
+          // Project the desired fields
           $project: {
             _id: 0,
             customer: "$_id.customer",

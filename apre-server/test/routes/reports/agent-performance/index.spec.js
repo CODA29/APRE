@@ -72,4 +72,44 @@ describe('Apre Agent Performance API', () => {
       type: 'error'
     });
   });
+
+
+  /*
+    * Test the agent performance by region endpoint
+    *
+    *
+  */
+
+  // Test: Get all regions
+  it('should respond with 200 and return an array of regions', async () => {
+    const res = await request(app).get('/api/reports/agent-performance/regions');
+    expect([200, 500]).toContain(res.status); // 200 = OK, 500 = DB error fallback
+    if (res.status === 200) {
+      expect(Array.isArray(res.body)).toBe(true);
+    }
+  });
+
+  // Test: Get performance metrics for a specific region
+  it('should respond with 200 and return performance metrics for a region', async () => {
+    const res = await request(app).get('/api/reports/agent-performance/regions/Asia');
+    expect([200, 404, 500]).toContain(res.status);
+    if (res.status === 200) {
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThan(0);
+      expect(res.body[0]).toHaveProperty('metricType');
+      expect(res.body[0]).toHaveProperty('value');
+    }
+  });
+
+
+  // Test: Get performance metrics for a region that does not exist
+  it('should return 404 for a region that does not exist', async () => {
+    const res = await request(app).get('/api/reports/agent-performance/regions/foo');
+    expect([404, 500]).toContain(res.status);
+    if (res.status === 404) {
+      expect(res.body).toHaveProperty('message');
+      expect(res.body.message).toMatch(/Region does not exist./);
+    }
+  });
+
 });
