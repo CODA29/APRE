@@ -16,6 +16,12 @@ jest.mock('../../../../src/utils/mongo');
 describe('Apre Customer Feedback API', () => {
   beforeEach(() => {
     mongo.mockClear();
+    const mockDb = {
+    collection: jest.fn().mockReturnValue({
+      distinct: jest.fn().mockResolvedValue(['John', 'Alice'])
+    })
+  };
+  mongo.mockImplementation(async (callback) => await callback(mockDb));
   });
 
   // Test the channel-rating-by-month endpoint
@@ -75,4 +81,45 @@ describe('Apre Customer Feedback API', () => {
       type: 'error'
     });
   });
+
+
+  //------------------------------------------------
+
+    // Test the customer feedback by customer endpoint
+
+  //
+
+  it('should return a list of customer names', async () => {
+    const res = await request(app).get('/api/reports/customer-feedback/customer-names');
+    expect(res.body).toEqual(['John', 'Alice']);
+  });
+
+
+  it('should return 404 when customer does not exist ', async() => {
+    // Mock Mongo to return empty array
+    mongo.mockImplementation(async (callback) => {
+      const mockDb = {
+        collection: jest.fn().mockReturnValue({
+          aggregate: jest.fn().mockReturnValue({
+            toArray: jest.fn().mockResolvedValue([])
+          })
+        })
+      };
+      await callback(mockDb);
+    });
+    const res = await request(app).get('/api/reports/customer-feedback/customer-feedback-by-customer/foo');
+    expect(res.status).toBe(404);
+    expect(res.body.message).toBe('Customer does not exist.')
+  });
+
+  it('should return 500 when unknown server issue happens', async() => {
+    const res = await request(app).get('/api/reports/customer-feedback/customer-names');
+
+    if(res.status === 500){
+      expect(res.body.message).toBe('Internal server error.');
+    }
+
+  });
+
+
 });

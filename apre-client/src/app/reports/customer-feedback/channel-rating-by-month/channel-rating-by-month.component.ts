@@ -33,7 +33,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
                 for accessibility purposes. When a user hovers over the button, the tooltip
                 text "Click to fetch data" will be displayed.
           -->
-          <button class="button button--primary" type="submit" title ="Click to fetch data">Submit</button>
+          <button class="button button--primary" type="submit" title ="Click to fetch data">Get Data</button> <!-- Changed the "Submit" button text to "Get Data." -->
 
         </div>
       </form>
